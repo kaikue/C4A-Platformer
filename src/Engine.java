@@ -1,6 +1,5 @@
-import org.lwjgl.LWJGLException;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.*;
+import org.lwjgl.opengl.*;
 
 public class Engine {
     public void start() {
@@ -17,6 +16,8 @@ public class Engine {
             Display.update();
         }
         Display.destroy();
+        //cleanup
+        System.exit(0);
     }
     public static void main(String[] argv) {
         Engine displayExample = new Engine();
