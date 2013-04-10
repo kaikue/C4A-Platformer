@@ -10,12 +10,15 @@ import org.newdawn.slick.util.*;
 public class Engine {
     
     private Texture texture;
+    private int bumbuuX, bumbuuY, bumbuuSpeed;
+    private boolean wPressed, aPressed, sPressed, dPressed; 
+    
     public void start() {
         initGL(800,600);
         init();
         
         while (true) {
-            pollInput();
+            update();
             
             GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
             render();
@@ -56,6 +59,13 @@ public class Engine {
     }
     
     public void init() {
+        wPressed = false;
+        aPressed = false;
+        sPressed = false;
+        dPressed = false;
+        bumbuuX = 100;
+        bumbuuY = 100;
+        bumbuuSpeed = 4;
         
         try {
             //load texture from PNG file
@@ -77,15 +87,35 @@ public class Engine {
         texture.bind(); // or GL11.glBind(texture.getTextureID());
  
         GL11.glBegin(GL11.GL_QUADS);
-        GL11.glTexCoord2f(0,0);
-        GL11.glVertex2f(100,100);
-        GL11.glTexCoord2f(1,0);
-        GL11.glVertex2f(100+texture.getTextureWidth(),100);
-        GL11.glTexCoord2f(1,1);
-        GL11.glVertex2f(100+texture.getTextureWidth(),100+texture.getTextureHeight());
-        GL11.glTexCoord2f(0,1);
-        GL11.glVertex2f(100,100+texture.getTextureHeight());
+        GL11.glTexCoord2f(0, 0);
+        GL11.glVertex2f(bumbuuX, bumbuuY);
+        GL11.glTexCoord2f(1, 0);
+        GL11.glVertex2f(bumbuuX + texture.getTextureWidth(), bumbuuY);
+        GL11.glTexCoord2f(1, 1);
+        GL11.glVertex2f(bumbuuX + texture.getTextureWidth(), bumbuuY + texture.getTextureHeight());
+        GL11.glTexCoord2f(0, 1);
+        GL11.glVertex2f(bumbuuX, bumbuuY + texture.getTextureHeight());
         GL11.glEnd();
+    }
+    
+    public void update() {
+        pollInput();
+        if(wPressed) {
+            bumbuuY -= bumbuuSpeed;
+            System.out.println("Buzz");
+        }
+        if(sPressed) {
+            bumbuuY += bumbuuSpeed;
+            System.out.println("Buzz");
+        }
+        if(aPressed) {
+            bumbuuX -= bumbuuSpeed;
+            System.out.println("Buzz");
+        }
+        if(dPressed) {
+            bumbuuX += bumbuuSpeed;
+            System.out.println("Buzz");
+        }
     }
     
     public void pollInput() {
@@ -102,24 +132,41 @@ public class Engine {
      
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
+                if (Keyboard.getEventKey() == Keyboard.KEY_W) {
+                    //System.out.println("W Key Pressed");
+                    wPressed = true;
+                }
                 if (Keyboard.getEventKey() == Keyboard.KEY_A) {
-                    System.out.println("A Key Pressed");
+                    //System.out.println("A Key Pressed");
+                    aPressed = true;
                 }
                 if (Keyboard.getEventKey() == Keyboard.KEY_S) {
-                    System.out.println("S Key Pressed");
+                    //System.out.println("S Key Pressed");
+                    sPressed = true;
                 }
                 if (Keyboard.getEventKey() == Keyboard.KEY_D) {
-                    System.out.println("D Key Pressed");
+                    //System.out.println("D Key Pressed");
+                    dPressed = true;
+                }
+                if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
+                    System.exit(0);
                 }
             } else {
+                if (Keyboard.getEventKey() == Keyboard.KEY_W) {
+                    //System.out.println("W Key Released");
+                    wPressed = false;
+                }
                 if (Keyboard.getEventKey() == Keyboard.KEY_A) {
-                    System.out.println("A Key Released");
+                    //System.out.println("A Key Released");
+                    aPressed = false;
                 }
                 if (Keyboard.getEventKey() == Keyboard.KEY_S) {
-                    System.out.println("S Key Released");
+                    //System.out.println("S Key Released");
+                    sPressed = false;
                 }
                 if (Keyboard.getEventKey() == Keyboard.KEY_D) {
-                    System.out.println("D Key Released");
+                    //System.out.println("D Key Released");
+                    dPressed = false;
                 }
             }
         }
