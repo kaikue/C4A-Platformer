@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.lwjgl.*;
 import org.lwjgl.input.*;
@@ -9,22 +11,17 @@ import org.newdawn.slick.util.*;
 
 public class Engine {
     
-    private Texture texture;
-    private int bumbuuX, bumbuuY, bumbuuSpeed;
-    private boolean wPressed, aPressed, sPressed, dPressed; 
+    //private boolean wPressed, aPressed, sPressed, dPressed;
+    private ArrayList<GameObject> objects;
+    private Player player;
     
     public void start() {
         initGL(800,600);
         init();
         
-        while (true) {
+        while(true) {
             update();
-            
-            GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
             render();
-            Display.update();
-            Display.sync(100);
-            
             if (Display.isCloseRequested()) {
                 Display.destroy();
                 System.exit(0);
@@ -59,62 +56,67 @@ public class Engine {
     }
     
     public void init() {
-        wPressed = false;
-        aPressed = false;
-        sPressed = false;
-        dPressed = false;
-        bumbuuX = 100;
-        bumbuuY = 100;
-        bumbuuSpeed = 4;
+        //wPressed = false;
+        //aPressed = false;
+        //sPressed = false;
+        //dPressed = false;
+        objects = new ArrayList<GameObject>();
         
+        Texture texPlayer = null;
         try {
-            //load texture from PNG file
-            texture = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/image.png"));
- 
-            System.out.println("Texture loaded: " + texture);
-            System.out.println(">> Image width: " + texture.getImageWidth());
-            System.out.println(">> Image height: " + texture.getImageHeight());
-            System.out.println(">> Texture width: " + texture.getTextureWidth());
-            System.out.println(">> Texture height: " + texture.getTextureHeight());
-            System.out.println(">> Texture ID: " + texture.getTextureID());
+            texPlayer = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/image.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
+        player = new Player(texPlayer, 100, 100, 4);
+        objects.add(player);
+        
+        Texture texFloor = null;
+        try {
+            texFloor = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/floor.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        GameObject floor = new GameObject(texFloor, 100, 400);
+        objects.add(floor);
     }
     
     public void render() {
-        Color.white.bind(); //change white to different colors for a rainbow of Bumbuu bees!
-        texture.bind(); // or GL11.glBind(texture.getTextureID());
- 
-        GL11.glBegin(GL11.GL_QUADS);
-        GL11.glTexCoord2f(0, 0);
-        GL11.glVertex2f(bumbuuX, bumbuuY);
-        GL11.glTexCoord2f(1, 0);
-        GL11.glVertex2f(bumbuuX + texture.getTextureWidth(), bumbuuY);
-        GL11.glTexCoord2f(1, 1);
-        GL11.glVertex2f(bumbuuX + texture.getTextureWidth(), bumbuuY + texture.getTextureHeight());
-        GL11.glTexCoord2f(0, 1);
-        GL11.glVertex2f(bumbuuX, bumbuuY + texture.getTextureHeight());
-        GL11.glEnd();
+        GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+        
+        for(GameObject obj : objects) {
+            obj.draw();
+        }
+        
+        Display.update();
+        Display.sync(100);
     }
     
     public void update() {
+        //move the player
         pollInput();
-        if(wPressed) {
-            bumbuuY -= bumbuuSpeed;
-            System.out.println("Buzz");
+        double[] playerVec = new double[2];
+        if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
+            playerVec[1] = -2; //this resets when w is released...
         }
-        if(sPressed) {
-            bumbuuY += bumbuuSpeed;
-            System.out.println("Buzz");
+        //if(sPressed) {
+        //    playerVec[1] = 1;
+        //}
+        if(Keyboard.isKeyDown(Keyboard.KEY_A)) {
+            playerVec[0] = -1;
         }
-        if(aPressed) {
-            bumbuuX -= bumbuuSpeed;
-            System.out.println("Buzz");
+        if(Keyboard.isKeyDown(Keyboard.KEY_D)) {
+            playerVec[0] = 1;
         }
-        if(dPressed) {
-            bumbuuX += bumbuuSpeed;
-            System.out.println("Buzz");
+        player.move(playerVec);
+        
+        //update the objects
+        for(GameObject object : objects) {
+            if(object instanceof MobileGameObject) {
+                MobileGameObject mobObject = (MobileGameObject)object;
+                mobObject.checkCollisions(objects);
+            }
+            object.update();
         }
     }
     
@@ -129,7 +131,11 @@ public class Engine {
         if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
             System.out.println("SPACE KEY IS DOWN");
         }
-     
+        
+        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+            System.exit(0);
+        }
+        /*
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 if (Keyboard.getEventKey() == Keyboard.KEY_W) {
@@ -170,6 +176,7 @@ public class Engine {
                 }
             }
         }
+        */
     }
     
     public static void main(String[] argv) {
