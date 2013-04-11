@@ -27,7 +27,7 @@ public abstract class GameObject {
     public void draw() {
         Color.white.bind(); //change white to different colors to tint the image
         texture.bind(); // or GL11.glBind(texture.getTextureID());
-        
+        //GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
         GL11.glBegin(GL11.GL_QUADS);
         GL11.glTexCoord2f(0, 0);
         GL11.glVertex2f(x, y);

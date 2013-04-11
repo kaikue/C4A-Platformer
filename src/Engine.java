@@ -4,8 +4,9 @@ import java.util.Arrays;
 
 import org.lwjgl.*;
 import org.lwjgl.input.*;
+import org.lwjgl.openal.*;
 import org.lwjgl.opengl.*;
-import org.newdawn.slick.*;
+import org.newdawn.slick.openal.*;
 import org.newdawn.slick.opengl.*;
 import org.newdawn.slick.util.*;
 
@@ -26,6 +27,7 @@ public class Engine {
             render();
             if (Display.isCloseRequested()) {
                 Display.destroy();
+                AL.destroy();
                 System.exit(0);
             }
         }
@@ -63,6 +65,12 @@ public class Engine {
         Texture texPlayer = null;
         try {
             texPlayer = TextureLoader.getTexture("PNG", ResourceLoader.getResourceAsStream("res/image.png"));
+            System.out.println("Texture loaded: "+texPlayer);
+            System.out.println(">> Image width: "+texPlayer.getImageWidth());
+            System.out.println(">> Image height: "+texPlayer.getImageHeight());
+            System.out.println(">> Texture width: "+texPlayer.getTextureWidth());
+            System.out.println(">> Texture height: "+texPlayer.getTextureHeight());
+            System.out.println(">> Texture ID: "+texPlayer.getTextureID());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -77,6 +85,16 @@ public class Engine {
         }
         GameObject floor = new StaticGameObject(texFloor, 100, 400);
         objects.add(floor);
+        
+        /*
+        Audio snd = null;
+        try {
+            snd = AudioLoader.getAudio("WAV", ResourceLoader.getResourceAsStream("res/music.wav"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        snd.playAsSoundEffect(1.0f, 1.0f, true);
+        */
     }
     
     public void render() {
@@ -97,7 +115,7 @@ public class Engine {
         }
         //pollInput();
         
-        //move the player
+        //set the player's vector
         double[] playerVec = player.getVec();
         if(Keyboard.isKeyDown(Keyboard.KEY_W) && player.getOnGround()) {
             playerVec[1] = -2.5;
@@ -186,7 +204,7 @@ public class Engine {
                     if(a.getBoundingBox().intersects(b.getBoundingBox()) && !a.equals(b)) {
                         GameObject[] col = {a, b};
                         GameObject[] colReverse = {b, a};
-                        if(!collisions.contains(colReverse)) {
+                        if(!collisions.contains(colReverse)) { //this should remove all duplicate collisions
                             collisions.add(col);
                         }
                     }
