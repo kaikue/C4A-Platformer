@@ -14,6 +14,8 @@ public class Engine {
     //private boolean wPressed, aPressed, sPressed, dPressed;
     private ArrayList<GameObject> objects;
     private Player player;
+    public static final int STEP_HEIGHT = 20;
+    public static final int MAX_VEL = 4;
     
     public void start() {
         initGL(800,600);
@@ -56,10 +58,6 @@ public class Engine {
     }
     
     public void init() {
-        //wPressed = false;
-        //aPressed = false;
-        //sPressed = false;
-        //dPressed = false;
         objects = new ArrayList<GameObject>();
         
         Texture texPlayer = null;
@@ -68,7 +66,7 @@ public class Engine {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        player = new Player(texPlayer, 100, 100, 4);
+        player = new Player(texPlayer, 100, -100, 4);
         objects.add(player);
         
         Texture texFloor = null;
@@ -77,7 +75,7 @@ public class Engine {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        GameObject floor = new GameObject(texFloor, 100, 400);
+        GameObject floor = new StaticGameObject(texFloor, 100, 400);
         objects.add(floor);
     }
     
@@ -93,34 +91,37 @@ public class Engine {
     }
     
     public void update() {
-        //move the player
-        pollInput();
-        double[] playerVec = new double[2];
-        if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
-            playerVec[1] = -2; //this resets when w is released...
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+            System.exit(0);
         }
-        //if(sPressed) {
-        //    playerVec[1] = 1;
-        //}
+        //pollInput();
+        
+        //move the player
+        double[] playerVec = player.getVec();
+        if(Keyboard.isKeyDown(Keyboard.KEY_W) && player.getOnGround()) {
+            playerVec[1] = -2.5;
+        }
+        playerVec[0] = 0;
         if(Keyboard.isKeyDown(Keyboard.KEY_A)) {
             playerVec[0] = -1;
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_D)) {
             playerVec[0] = 1;
         }
-        player.move(playerVec);
+        player.setVec(playerVec);
+        player.setOnGround(false);
+        
         
         //update the objects
         for(GameObject object : objects) {
-            if(object instanceof MobileGameObject) {
-                MobileGameObject mobObject = (MobileGameObject)object;
-                mobObject.checkCollisions(objects);
-            }
             object.update();
         }
+
+        checkCollisions();
     }
     
-    public void pollInput() {
+    /*public void pollInput() {
         if (Mouse.isButtonDown(0)) {
             int x = Mouse.getX();
             int y = Mouse.getY();
@@ -132,15 +133,14 @@ public class Engine {
             System.out.println("SPACE KEY IS DOWN");
         }
         
-        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-            System.exit(0);
-        }
-        /*
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 if (Keyboard.getEventKey() == Keyboard.KEY_W) {
                     //System.out.println("W Key Pressed");
-                    wPressed = true;
+                    //wPressed = true;
+                    double[] playerVec = player.getVec();
+                    playerVec[1] = -2;
+                    player.setVec(playerVec);
                 }
                 if (Keyboard.getEventKey() == Keyboard.KEY_A) {
                     //System.out.println("A Key Pressed");
@@ -176,7 +176,47 @@ public class Engine {
                 }
             }
         }
-        */
+    }*/
+    
+    public void checkCollisions() {
+        ArrayList<GameObject[]> collisions = new ArrayList<GameObject[]>();
+        for(GameObject a : objects) {
+            if(a instanceof MobileGameObject) { //maybe? immobile objects won't detect collisions
+                for(GameObject b : objects) {
+                    if(a.getBoundingBox().intersects(b.getBoundingBox()) && !a.equals(b)) {
+                        GameObject[] col = {a, b};
+                        GameObject[] colReverse = {b, a};
+                        if(!collisions.contains(colReverse)) {
+                            collisions.add(col);
+                        }
+                    }
+                }
+            }
+        }
+        for(GameObject[] pair : collisions) {
+            collide(pair[0], pair[1]);
+        }
+    }
+    
+    public void collide(GameObject a, GameObject b) {
+        if(a instanceof Player && b instanceof StaticGameObject) {
+            if(b.getY() >= player.getY() + player.getHeight() - STEP_HEIGHT) {
+                player.setOnGround(true);
+                double[] playerVec = player.getVec();
+                playerVec[1] = 0;
+                player.setVec(playerVec);
+                player.setY(b.getY() - player.getHeight()); 
+            }
+        }
+        else if(b instanceof Player && a instanceof StaticGameObject) {
+            if(a.getY() >= player.getY() + player.getHeight() - STEP_HEIGHT) {
+                player.setOnGround(true);
+                double[] playerVec = player.getVec();
+                playerVec[1] = 0;
+                player.setVec(playerVec);
+                player.setY(a.getY() - player.getHeight()); 
+            }
+        }
     }
     
     public static void main(String[] argv) {

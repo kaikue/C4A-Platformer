@@ -1,39 +1,42 @@
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import org.newdawn.slick.opengl.*;
 
 public class MobileGameObject extends GameObject {
     
     private int speed;
-    private ArrayList<GameObject> collisions;
+    private double[] vec;
     
     public MobileGameObject(Texture texture, int x, int y, int speed) {
         super(texture, x, y);
         this.speed = speed;
-        collisions = new ArrayList<GameObject>();
+        vec = new double[2];
     }
     
-    public void checkCollisions(ArrayList<GameObject> objects) {
-        collisions = new ArrayList<GameObject>();
-        for(GameObject object : objects) {
-            if(getBoundingBox().intersects(object.getBoundingBox()) && !object.equals(this)) {
-                collisions.add(object);
-            }
-        }
+    public void move() {
+        //that should probably be a real vector?
+        setX(getX() + (int)(getSpeed() * vec[0]));
+        setY(getY() + (int)(getSpeed() * vec[1]));
+    }
+    
+    @Override
+    public void update() {
+        move();
+        super.update();
     }
     
     public int getSpeed() {
         return speed;
     }
     
-    public ArrayList<GameObject> getCollisions() {
-        return collisions;
+    public double[] getVec() {
+        return vec;
     }
     
     public void setSpeed(int speed) {
         this.speed = speed;
     }
     
-    public void setCollisions(ArrayList<GameObject> collisions) {
-        this.collisions = collisions;
+    public void setVec(double[] vec) {
+        this.vec = vec;
     }
 }
