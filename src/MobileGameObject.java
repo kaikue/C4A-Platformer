@@ -4,24 +4,26 @@ import org.newdawn.slick.opengl.*;
 public class MobileGameObject extends GameObject {
     
     private int speed;
-    private double[] vec;
+    private double[] vec; //that should probably be a real vector?
     
-    public MobileGameObject(Texture texture, int x, int y, int speed) {
-        super(texture, x, y);
+    public MobileGameObject(Texture texture, int x, int y, int speed, boolean solid) {
+        super(texture, x, y, solid);
         this.speed = speed;
         vec = new double[2];
     }
     
-    public void move() {
-        //that should probably be a real vector?
-        setX(getX() + (int)(getSpeed() * vec[0]));
-        setY(getY() + (int)(getSpeed() * vec[1]));
+    public MobileGameObject(Texture texture, int x, int y, int speed) {
+        this(texture, x, y, speed, true);
     }
     
-    @Override
-    public void update() {
-        move();
-        super.update();
+    public void moveX() {
+        setX(getX() + (int)(getSpeed() * vec[0]));
+        //getBoundingBox().x = getX();
+    }
+    
+    public void moveY() {
+        setY(getY() + (int)(getSpeed() * vec[1]));
+        //getBoundingBox().y = getY();
     }
     
     public int getSpeed() {
