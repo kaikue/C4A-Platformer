@@ -123,13 +123,12 @@ public class Engine {
     }
     
     public void update() {
-
         if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             System.exit(0);
         }
         //pollInput();
         
-        //set the player's vector
+        //set the player's vector based on keyboard input
         double[] playerVec = player.getVec();
         if(Keyboard.isKeyDown(Keyboard.KEY_W) && playerOnGround()) {
             playerVec[1] = -2.5;
@@ -147,8 +146,9 @@ public class Engine {
         for(GameObject object : objects) {
             object.update();
             if(object instanceof MobileGameObject) {
-                System.out.println("\nUpdating player...");
+                //move it, check for collisions, move it back if necessary
                 MobileGameObject mObject = (MobileGameObject)object;
+                System.out.println("\nUpdating " + mObject + "...");
                 int oldX = mObject.getX();
                 System.out.println("Old X = " + oldX);
                 mObject.moveX();
@@ -177,6 +177,7 @@ public class Engine {
     }
     
     public boolean playerOnGround() {
+        //checks if a line 1 pixel beneath the player intersects a solid object
         boolean ground = false;
         for(GameObject o : objects) {
             if(o.isSolid() && o.getBoundingBox().intersectsLine(player.getX(), player.getY() + player.getHeight() + 1, player.getX() + player.getWidth(), player.getY() + player.getHeight() + 1) && !o.equals(player)) {
@@ -192,51 +193,18 @@ public class Engine {
      
             System.out.println("MOUSE DOWN @ X: " + x + " Y: " + y);
         }
-     
-        if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-            System.out.println("SPACE KEY IS DOWN");
-        }
         
         while (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
-                if (Keyboard.getEventKey() == Keyboard.KEY_W) {
-                    //System.out.println("W Key Pressed");
-                    //wPressed = true;
-                    double[] playerVec = player.getVec();
-                    playerVec[1] = -2;
-                    player.setVec(playerVec);
-                }
-                if (Keyboard.getEventKey() == Keyboard.KEY_A) {
-                    //System.out.println("A Key Pressed");
-                    aPressed = true;
-                }
-                if (Keyboard.getEventKey() == Keyboard.KEY_S) {
-                    //System.out.println("S Key Pressed");
-                    sPressed = true;
-                }
-                if (Keyboard.getEventKey() == Keyboard.KEY_D) {
-                    //System.out.println("D Key Pressed");
-                    dPressed = true;
+                if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
+                    System.out.println("Space Key Pressed");
                 }
                 if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
                     System.exit(0);
                 }
             } else {
-                if (Keyboard.getEventKey() == Keyboard.KEY_W) {
-                    //System.out.println("W Key Released");
-                    wPressed = false;
-                }
-                if (Keyboard.getEventKey() == Keyboard.KEY_A) {
-                    //System.out.println("A Key Released");
-                    aPressed = false;
-                }
-                if (Keyboard.getEventKey() == Keyboard.KEY_S) {
-                    //System.out.println("S Key Released");
-                    sPressed = false;
-                }
-                if (Keyboard.getEventKey() == Keyboard.KEY_D) {
-                    //System.out.println("D Key Released");
-                    dPressed = false;
+                if (Keyboard.getEventKey() == Keyboard.KEY_SPACE) {
+                    System.out.println("Space Key Released");
                 }
             }
         }
@@ -244,19 +212,12 @@ public class Engine {
     
     public boolean checkCollisions(GameObject a) {
         ArrayList<GameObject[]> collisions = new ArrayList<GameObject[]>();
-        //for(GameObject a : objects) {
-            //if(a instanceof MobileGameObject) { //maybe? immobile objects won't detect collisions
-                for(GameObject b : objects) {
-                    if(a.getBoundingBox().intersects(b.getBoundingBox()) && !a.equals(b) && b.isSolid()) {
-                        GameObject[] col = {a, b};
-                        //GameObject[] colReverse = {b, a};
-                        //if(!collisions.contains(colReverse)) { //this should remove all duplicate collisions
-                            collisions.add(col);                 //although with the way I call it now, I might not need this...
-                        //}
-                    }
-                 }
-            //}
-        //}
+        for(GameObject b : objects) {
+            if(a.getBoundingBox().intersects(b.getBoundingBox()) && !a.equals(b) && b.isSolid()) {
+                GameObject[] col = {a, b};
+                collisions.add(col);
+            }
+        }
         for(GameObject[] pair : collisions) {
             collide(pair[0], pair[1]);
         }
@@ -264,12 +225,14 @@ public class Engine {
     }
     
     public void collide(GameObject a, GameObject b) {
+        //used to make special events happen upon collisions.
+        //example:
         /*
         if(a instanceof Player && b instanceof Pickup) {
-            collect the pickup
+            //collect the pickup
         }
         else if(b instanceof Player && a instanceof Pickup) {
-            collect the pickup
+            //collect the pickup
         }
         */
     }
@@ -284,5 +247,11 @@ public class Engine {
 LIST OF BUGS:
 Audio doesn't work (because I'm just using shady incompatible .jars)
 Textures wrap slightly (problem with wrapping vs. clamping?)
-Player movement is jerky (resets x when colliding with y?)
+
+TO DO:
+Levels (code and design- use Tiled?)
+    Scrolling view
+Moving platforms
+Enemies
+Projectiles
 */
