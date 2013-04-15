@@ -12,7 +12,6 @@ import org.newdawn.slick.util.*;
 
 public class Engine {
     
-    //private boolean wPressed, aPressed, sPressed, dPressed;
     private ArrayList<GameObject> objects;
     private Player player;
     public static final int STEP_HEIGHT = 20;
@@ -126,19 +125,19 @@ public class Engine {
         if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             System.exit(0);
         }
-        //pollInput();
+        pollInput();
         
         //set the player's vector based on keyboard input
         double[] playerVec = player.getVec();
-        if(Keyboard.isKeyDown(Keyboard.KEY_W) && playerOnGround()) {
+        if((Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_UP)) && playerOnGround()) {
             playerVec[1] = -2.5;
         }
         playerVec[0] = 0;
-        if(Keyboard.isKeyDown(Keyboard.KEY_A)) {
-            playerVec[0] = -1;
+        if(Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+            playerVec[0] += -1;
         }
-        if(Keyboard.isKeyDown(Keyboard.KEY_D)) {
-            playerVec[0] = 1;
+        if(Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+            playerVec[0] += 1;
         }
         player.setVec(playerVec);
         
@@ -186,7 +185,8 @@ public class Engine {
         }
         return ground;
     }
-    /*public void pollInput() {
+    
+    public void pollInput() {
         if (Mouse.isButtonDown(0)) {
             int x = Mouse.getX();
             int y = Mouse.getY();
@@ -208,7 +208,7 @@ public class Engine {
                 }
             }
         }
-    }*/
+    }
     
     public boolean checkCollisions(GameObject a) {
         ArrayList<GameObject[]> collisions = new ArrayList<GameObject[]>();
