@@ -82,11 +82,11 @@ public class Engine {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        StaticGameObject floor = new StaticGameObject(texFloor, 100, 400);
+        StaticGameObject floor = new StaticGameObject(texFloor, 100, 100);
         objects.add(floor);
         //StaticGameObject ceiling = new StaticGameObject(texFloor, 100, 100);
         //objects.add(ceiling);
-        HorizontalMovingPlatform p = new HorizontalMovingPlatform(texFloor, 100, 100, 4, 50);
+        HorizontalMovingPlatform p = new HorizontalMovingPlatform(texFloor, 100, 400, 4, 50);
         objects.add(p);
         
         Texture texWall = null;
@@ -131,16 +131,22 @@ public class Engine {
         
         //set the player's vector based on keyboard input
         double[] playerVec = player.getVec();
-        if((Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_UP)) && playerOnGround()) {
+        playerVec[0] = 0;
+        GameObject objBelowPlayer = objBelowPlayer();
+        if(objBelowPlayer instanceof HorizontalMovingPlatform) {
+            playerVec[0] = ((HorizontalMovingPlatform)objBelowPlayer).getVec()[0];
+        }
+        System.out.println("Before input: " + Arrays.toString(playerVec));
+        if((Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_UP)) && objBelowPlayer != null) {
             playerVec[1] = -2.5;
         }
-        playerVec[0] = 0;
         if(Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
             playerVec[0] += -1;
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
             playerVec[0] += 1;
         }
+        System.out.println("After: " + Arrays.toString(playerVec));
         player.setVec(playerVec);
         
         //update the objects
@@ -149,26 +155,26 @@ public class Engine {
             if(object instanceof MobileGameObject) {
                 //move it, check for collisions, move it back if necessary
                 MobileGameObject mObject = (MobileGameObject)object;
-                System.out.println("\nUpdating " + mObject + "...");
+                //System.out.println("\nUpdating " + mObject + "...");
                 int oldX = mObject.getX();
-                System.out.println("Old X = " + oldX);
+                //System.out.println("Old X = " + oldX);
                 mObject.moveX();
-                System.out.println("New X = " + mObject.getX());
+                //System.out.println("New X = " + mObject.getX());
                 if(checkCollisions(mObject)) {
                     mObject.setX(oldX);
-                    System.out.println("Moved " + mObject + " back to X=" + oldX);
+                    //System.out.println("Moved " + mObject + " back to X=" + oldX);
                     double[] vec = mObject.getVec();
                     double[] newVec = {0, vec[1]};
                     mObject.setVec(newVec);
                 }
                 
                 int oldY = mObject.getY();
-                System.out.println("Old Y = " + oldY);
+                //System.out.println("Old Y = " + oldY);
                 mObject.moveY();
-                System.out.println("New Y = " + mObject.getY());
+                //System.out.println("New Y = " + mObject.getY());
                 if(checkCollisions(mObject)) {
                     mObject.setY(oldY);
-                    System.out.println("Moved " + mObject + " back to Y=" + oldY);
+                    //System.out.println("Moved " + mObject + " back to Y=" + oldY);
                     double[] vec = mObject.getVec();
                     double[] newVec = {vec[0], 0};
                     mObject.setVec(newVec);
@@ -177,15 +183,14 @@ public class Engine {
         }
     }
     
-    public boolean playerOnGround() {
-        //checks if a line 1 pixel beneath the player intersects a solid object
-        boolean ground = false;
+    public GameObject objBelowPlayer() {
+        //checks if a line 1 pixel beneath the player intersects a solid object, returns the first one it finds
         for(GameObject o : objects) {
             if(o.isSolid() && o.getBoundingBox().intersectsLine(player.getX(), player.getY() + player.getHeight() + 1, player.getX() + player.getWidth(), player.getY() + player.getHeight() + 1) && !o.equals(player)) {
-                ground = true;
+                return o;
             }
         }
-        return ground;
+        return null;
     }
     
     public void pollInput() {
@@ -249,11 +254,13 @@ public class Engine {
 LIST OF BUGS:
 Audio doesn't work (because I'm just using shady incompatible .jars)
 Textures wrap slightly (problem with wrapping vs. clamping?)
+Player can slide through walls while on moving platforms
+Player jumping while not on moving platforms should still be relative to the last platform stood on
 
 TO DO:
 Levels (code and design- use Tiled?)
     Scrolling view
-Moving platforms
+Vertical moving platforms
 Enemies
 Projectiles
 */
