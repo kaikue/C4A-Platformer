@@ -84,8 +84,10 @@ public class Engine {
         }
         StaticGameObject floor = new StaticGameObject(texFloor, 100, 400);
         objects.add(floor);
-        StaticGameObject ceiling = new StaticGameObject(texFloor, 100, 100);
-        objects.add(ceiling);
+        //StaticGameObject ceiling = new StaticGameObject(texFloor, 100, 100);
+        //objects.add(ceiling);
+        HorizontalMovingPlatform p = new HorizontalMovingPlatform(texFloor, 100, 100, 4, 50);
+        objects.add(p);
         
         Texture texWall = null;
         try {
