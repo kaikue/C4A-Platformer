@@ -14,7 +14,7 @@ public class Engine {
     
     private ArrayList<GameObject> objects;
     private Player player;
-    public static final int STEP_HEIGHT = 20;
+    public static final int STEP_HEIGHT = 10;
     public static final int MAX_VEL = 4;
     
     public void start() {
@@ -86,7 +86,8 @@ public class Engine {
         objects.add(floor);
         //StaticGameObject ceiling = new StaticGameObject(texFloor, 100, 100);
         //objects.add(ceiling);
-        HorizontalMovingPlatform p = new HorizontalMovingPlatform(texFloor, 100, 400, 4, 50);
+        double[] vec = {0, 1};
+        MovingPlatform p = new MovingPlatform(texFloor, 100, 400, 4, 50, vec);
         objects.add(p);
         
         Texture texWall = null;
@@ -133,12 +134,13 @@ public class Engine {
         double[] playerVec = player.getVec();
         playerVec[0] = 0;
         GameObject objBelowPlayer = objBelowPlayer();
-        if(objBelowPlayer instanceof HorizontalMovingPlatform) {
-            playerVec[0] = ((HorizontalMovingPlatform)objBelowPlayer).getVec()[0];
+        if(objBelowPlayer instanceof MovingPlatform) {
+            playerVec[0] = ((MovingPlatform)objBelowPlayer).getVec()[0];
+            playerVec[1] = ((MovingPlatform)objBelowPlayer).getVec()[1];
         }
-        System.out.println("Before input: " + Arrays.toString(playerVec));
         if((Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_UP)) && objBelowPlayer != null) {
-            playerVec[1] = -2.5;
+            System.out.println("jump!");
+            playerVec[1] += -2.5;
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
             playerVec[0] += -1;
@@ -146,7 +148,6 @@ public class Engine {
         if(Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
             playerVec[0] += 1;
         }
-        System.out.println("After: " + Arrays.toString(playerVec));
         player.setVec(playerVec);
         
         //update the objects
@@ -155,26 +156,26 @@ public class Engine {
             if(object instanceof MobileGameObject) {
                 //move it, check for collisions, move it back if necessary
                 MobileGameObject mObject = (MobileGameObject)object;
-                //System.out.println("\nUpdating " + mObject + "...");
+                System.out.println("\nUpdating " + mObject + "...");
                 int oldX = mObject.getX();
-                //System.out.println("Old X = " + oldX);
+                System.out.println("Old X = " + oldX);
                 mObject.moveX();
-                //System.out.println("New X = " + mObject.getX());
+                System.out.println("New X = " + mObject.getX());
                 if(checkCollisions(mObject)) {
                     mObject.setX(oldX);
-                    //System.out.println("Moved " + mObject + " back to X=" + oldX);
+                    System.out.println("Moved " + mObject + " back to X=" + oldX);
                     double[] vec = mObject.getVec();
                     double[] newVec = {0, vec[1]};
                     mObject.setVec(newVec);
                 }
                 
                 int oldY = mObject.getY();
-                //System.out.println("Old Y = " + oldY);
+                System.out.println("Old Y = " + oldY);
                 mObject.moveY();
-                //System.out.println("New Y = " + mObject.getY());
+                System.out.println("New Y = " + mObject.getY());
                 if(checkCollisions(mObject)) {
                     mObject.setY(oldY);
-                    //System.out.println("Moved " + mObject + " back to Y=" + oldY);
+                    System.out.println("Moved " + mObject + " back to Y=" + oldY);
                     double[] vec = mObject.getVec();
                     double[] newVec = {vec[0], 0};
                     mObject.setVec(newVec);
@@ -184,9 +185,9 @@ public class Engine {
     }
     
     public GameObject objBelowPlayer() {
-        //checks if a line 1 pixel beneath the player intersects a solid object, returns the first one it finds
+        //checks if a line STEP_HEIGHT pixels beneath the player intersects a solid object, returns the first one it finds
         for(GameObject o : objects) {
-            if(o.isSolid() && o.getBoundingBox().intersectsLine(player.getX(), player.getY() + player.getHeight() + 1, player.getX() + player.getWidth(), player.getY() + player.getHeight() + 1) && !o.equals(player)) {
+            if(o.isSolid() && o.getBoundingBox().intersectsLine(player.getX(), player.getY() + player.getHeight() + STEP_HEIGHT, player.getX() + player.getWidth(), player.getY() + player.getHeight() + STEP_HEIGHT) && !o.equals(player)) {
                 return o;
             }
         }

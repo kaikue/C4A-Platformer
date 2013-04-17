@@ -1,34 +1,36 @@
 import org.newdawn.slick.opengl.*;
 
 
-public class HorizontalMovingPlatform extends MobileGameObject {
+public class MovingPlatform extends MobileGameObject {
     
     private int pathLength;
     private int currentStep;
-    private boolean right;
+    private boolean forward;
+    private double[] direction;
     
-    public HorizontalMovingPlatform(Texture texture, int x, int y, int speed, int pathLength) {
+    public MovingPlatform(Texture texture, int x, int y, int speed, int pathLength, double[] direction) {
         super(texture, x, y, speed, true);
         this.pathLength = pathLength;
         currentStep = 0;
-        right = true; //starts going right
-        double[] vec = {1, 0};
+        forward = true;
+        this.direction = direction;
+        double[] vec = direction;
         setVec(vec);
     }
     
     @Override
     public void update() {
         if(currentStep >= pathLength) {
-            right = false;
-            double[] vec = {-1, 0};
+            forward = false;
+            double[] vec = {-direction[0], -direction[1]};
             setVec(vec);
         }
         else if(currentStep <= 0) {
-            right = true;
-            double[] vec = {1, 0};
+            forward = true;
+            double[] vec = {direction[0], direction[1]};
             setVec(vec);
         }
-        if(right) {
+        if(forward) {
             currentStep++;
         }
         else {
