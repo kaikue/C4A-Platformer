@@ -9,7 +9,7 @@ public class Player extends MobileGameObject {
     @Override
     public void update() {
         double[] vec = getVec();
-        vec[1] += 0.1;
+        vec[1] += 0.5;
         if(vec[1] > Engine.MAX_VEL) {
             vec[1] = Engine.MAX_VEL;
         }

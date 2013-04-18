@@ -15,10 +15,10 @@ public class Engine {
     private ArrayList<GameObject> objects;
     private Player player;
     public static final int STEP_HEIGHT = 10;
-    public static final int MAX_VEL = 4;
+    public static final int MAX_VEL = 20;
     
     public void start() {
-        initGL(800,600);
+        initGL(800, 600);
         init();
         
         while(true) {
@@ -139,14 +139,13 @@ public class Engine {
             playerVec[1] = ((MovingPlatform)objBelowPlayer).getVec()[1];
         }
         if((Keyboard.isKeyDown(Keyboard.KEY_W) || Keyboard.isKeyDown(Keyboard.KEY_UP)) && objBelowPlayer != null) {
-            System.out.println("jump!");
-            playerVec[1] += -2.5;
+            playerVec[1] -= 10;
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_A) || Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-            playerVec[0] += -1;
+            playerVec[0] += -player.getSpeed();
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_D) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-            playerVec[0] += 1;
+            playerVec[0] += player.getSpeed();
         }
         player.setVec(playerVec);
         
@@ -156,28 +155,39 @@ public class Engine {
             if(object instanceof MobileGameObject) {
                 //move it, check for collisions, move it back if necessary
                 MobileGameObject mObject = (MobileGameObject)object;
-                System.out.println("\nUpdating " + mObject + "...");
-                int oldX = mObject.getX();
-                System.out.println("Old X = " + oldX);
-                mObject.moveX();
-                System.out.println("New X = " + mObject.getX());
-                if(checkCollisions(mObject)) {
-                    mObject.setX(oldX);
-                    System.out.println("Moved " + mObject + " back to X=" + oldX);
-                    double[] vec = mObject.getVec();
-                    double[] newVec = {0, vec[1]};
-                    mObject.setVec(newVec);
-                }
+                //System.out.println("\nUpdating " + mObject + "...");
                 
                 int oldY = mObject.getY();
-                System.out.println("Old Y = " + oldY);
+                //System.out.println("Old Y = " + oldY);
                 mObject.moveY();
-                System.out.println("New Y = " + mObject.getY());
+                //System.out.println("New Y = " + mObject.getY());
                 if(checkCollisions(mObject)) {
-                    mObject.setY(oldY);
-                    System.out.println("Moved " + mObject + " back to Y=" + oldY);
+                    if(mObject instanceof Player && objBelowPlayer instanceof MovingPlatform) {
+                        double[] vec = {mObject.getVec()[0], ((MobileGameObject)objBelowPlayer).getVec()[1]};
+                        System.out.println("Player: " + Arrays.toString(vec) + ", platform: " + Arrays.toString(((MobileGameObject)objBelowPlayer).getVec()));
+                        player.setVec(vec);
+                        player.moveY();
+                        player.setY(player.getY() + (int)player.getVec()[1]);
+                        //player.setY(objBelowPlayer.getY() - player.getHeight() + (int)(((MobileGameObject)objBelowPlayer).getVec()[1]));
+                    }
+                    else {
+                        mObject.setY(oldY);
+                        //System.out.println("Moved " + mObject + " back to Y=" + oldY);
+                        double[] vec = mObject.getVec();
+                        double[] newVec = {vec[0], 0};
+                        mObject.setVec(newVec);
+                    }
+                }
+                
+                int oldX = mObject.getX();
+                //System.out.println("Old X = " + oldX);
+                mObject.moveX();
+                //System.out.println("New X = " + mObject.getX());
+                if(checkCollisions(mObject)) {
+                    mObject.setX(oldX);
+                    //System.out.println("Moved " + mObject + " back to X=" + oldX);
                     double[] vec = mObject.getVec();
-                    double[] newVec = {vec[0], 0};
+                    double[] newVec = {0, vec[1]};
                     mObject.setVec(newVec);
                 }
             }
@@ -257,11 +267,14 @@ Audio doesn't work (because I'm just using shady incompatible .jars)
 Textures wrap slightly (problem with wrapping vs. clamping?)
 Player can slide through walls while on moving platforms
 Player jumping while not on moving platforms should still be relative to the last platform stood on
+Vertical moving platforms still have some issues
+    jittery while moving up
+    sometimes the player jumps a bit at the top
+    jumping up from under them makes the player get stuck
 
 TO DO:
 Levels (code and design- use Tiled?)
     Scrolling view
-Vertical moving platforms
 Enemies
 Projectiles
 */

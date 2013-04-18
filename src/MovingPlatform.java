@@ -22,12 +22,12 @@ public class MovingPlatform extends MobileGameObject {
     public void update() {
         if(currentStep >= pathLength) {
             forward = false;
-            double[] vec = {-direction[0], -direction[1]};
+            double[] vec = {-direction[0] * getSpeed(), -direction[1] * getSpeed()};
             setVec(vec);
         }
         else if(currentStep <= 0) {
             forward = true;
-            double[] vec = {direction[0], direction[1]};
+            double[] vec = {direction[0] * getSpeed(), direction[1] * getSpeed()};
             setVec(vec);
         }
         if(forward) {

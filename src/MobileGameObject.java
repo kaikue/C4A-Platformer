@@ -17,11 +17,11 @@ public class MobileGameObject extends GameObject {
     }
     
     public void moveX() {
-        setX(getX() + (int)(getSpeed() * vec[0]));
+        setX(getX() + (int)vec[0]);
     }
     
     public void moveY() {
-        setY(getY() + (int)(getSpeed() * vec[1]));
+        setY(getY() + (int)vec[1]);
     }
     
     public int getSpeed() {
