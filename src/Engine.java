@@ -73,7 +73,7 @@ public class Engine {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        player = new Player(texPlayer, 100, 250, 4);
+        player = new Player(texPlayer, 250, 250, 4);
         objects.add(player);
         
         Texture texFloor = null;
@@ -96,7 +96,7 @@ public class Engine {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        StaticGameObject wall1 = new StaticGameObject(texWall, -50, 50);
+        StaticGameObject wall1 = new StaticGameObject(texWall, 100, -250);
         objects.add(wall1);
         StaticGameObject wall2 = new StaticGameObject(texWall, 550, 50, false);
         objects.add(wall2);
@@ -264,13 +264,14 @@ public class Engine {
 /*
 LIST OF BUGS:
 Audio doesn't work (because I'm just using shady incompatible .jars)
-Textures wrap slightly (problem with wrapping vs. clamping?)
-Player can slide through walls while on moving platforms
-Player jumping while not on moving platforms should still be relative to the last platform stood on
+Textures wrap slightly when not using power of 2 sized images (problem with wrapping vs. clamping?)
+Player can get stuck on corner of wall
+Player jumping while not on moving platforms should be relative to the last platform stood on
 Vertical moving platforms still have some issues
     jittery while moving up
     sometimes the player jumps a bit at the top
-    jumping up from under them makes the player get stuck
+    jumping up into them makes the player get stuck
+    player can be pushed into walls
 
 TO DO:
 Levels (code and design- use Tiled?)
