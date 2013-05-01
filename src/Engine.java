@@ -6,23 +6,31 @@ import org.lwjgl.*;
 import org.lwjgl.input.*;
 import org.lwjgl.openal.*;
 import org.lwjgl.opengl.*;
+import org.newdawn.slick.openal.*;
 import org.newdawn.slick.opengl.*;
 import org.newdawn.slick.util.*;
 
 public class Engine {
     
+	private Audio oggMusic;
     private ArrayList<GameObject> objects;
     private Player player;
     public static final int STEP_HEIGHT = 10;
     public static final int MAX_VEL = 20;
+    public static final int GAME_WIDTH = 800;
+    public static final int GAME_HEIGHT = 600;
     
     public void start() {
-        initGL(800, 600);
+        initGL(GAME_WIDTH, GAME_HEIGHT);
         init();
+        
+        oggMusic.playAsMusic(1.0f, 1.0f, true);
+        SoundStore.get().poll(0);
         
         while(true) {
             update();
             render();
+            
             if (Display.isCloseRequested()) {
                 Display.destroy();
                 AL.destroy();
@@ -58,6 +66,7 @@ public class Engine {
     }
     
     public void init() {
+    	
         objects = new ArrayList<GameObject>();
         
         Texture texPlayer = null;
@@ -100,15 +109,9 @@ public class Engine {
         StaticGameObject wall2 = new StaticGameObject(texWall, 550, 50, false);
         objects.add(wall2);
         
-        /*
-        Audio snd = null;
         try {
-            snd = AudioLoader.getAudio("WAV", ResourceLoader.getResourceAsStream("res/music.wav"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        snd.playAsSoundEffect(1.0f, 1.0f, true);
-        */
+        	oggMusic = AudioLoader.getAudio("OGG", ResourceLoader.getResourceAsStream("res/jbbaby.ogg"));
+        } catch (IOException e) { System.out.println("audio error: "); e.printStackTrace(); }
     }
     
     public void render() {
@@ -167,9 +170,8 @@ public class Engine {
                         player.setVec(vec);
                         player.moveY();
                         player.setY(player.getY() + (int)player.getVec()[1]);
-                        //player.setY(objBelowPlayer.getY() - player.getHeight() + (int)(((MobileGameObject)objBelowPlayer).getVec()[1]));
-                    }
-                    else {
+//                        player.setY(objBelowPlayer.getY() - player.getHeight() + (int)(((MobileGameObject)objBelowPlayer).getVec()[1]));
+                    } else {
                         mObject.setY(oldY);
                         //System.out.println("Moved " + mObject + " back to Y=" + oldY);
                         double[] vec = mObject.getVec();
@@ -191,6 +193,7 @@ public class Engine {
                 }
             }
         }
+        
     }
     
     public GameObject objBelowPlayer() {
