@@ -6,7 +6,6 @@ import org.lwjgl.*;
 import org.lwjgl.input.*;
 import org.lwjgl.openal.*;
 import org.lwjgl.opengl.*;
-import org.newdawn.slick.openal.*;
 import org.newdawn.slick.opengl.*;
 import org.newdawn.slick.util.*;
 
