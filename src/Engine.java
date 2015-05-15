@@ -170,7 +170,7 @@ public class Engine {
                         player.setVec(vec);
                         player.moveY();
                         player.setY(player.getY() + (int)player.getVec()[1]);
-//                        player.setY(objBelowPlayer.getY() - player.getHeight() + (int)(((MobileGameObject)objBelowPlayer).getVec()[1]));
+                        player.setY(objBelowPlayer.getY() - player.getHeight() + (int)(((MobileGameObject)objBelowPlayer).getVec()[1]));
                     } else {
                         mObject.setY(oldY);
                         //System.out.println("Moved " + mObject + " back to Y=" + oldY);
